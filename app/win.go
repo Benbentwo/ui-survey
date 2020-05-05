@@ -3,20 +3,21 @@
 package app
 
 import (
-	"github.com/Benbentwo/go-bin-generic/pkg/cmd"
+	"github.com/Benbentwo/ui-survey/pkg/cmd"
+	"github.com/spf13/cobra"
 	"os"
 	"syscall"
 )
 
 // Run runs the command, if args are not nil they will be set on the command
-func Run(args []string) error {
+func Run(args []string) *cobra.Command {
 	configureTerminalForAnsiEscapes()
 	cmd := cmd.NewMainCmd(os.Stdin, os.Stdout, os.Stderr, nil)
 	if len(args) > 0 {
 		args = args[1:]
 		cmd.SetArgs(args)
 	}
-	return cmd.Execute()
+	return cmd
 }
 
 const (

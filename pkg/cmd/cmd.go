@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/Benbentwo/go-bin-generic/pkg/cmd/common"
-	"github.com/Benbentwo/go-bin-generic/pkg/version"
+	"github.com/Benbentwo/ui-survey/pkg/cmd/common"
+	"github.com/Benbentwo/ui-survey/pkg/version"
 	"github.com/spf13/viper"
 	"io"
 	"strings"

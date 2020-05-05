@@ -1,7 +1,7 @@
 GIT_SERVER 	:= github.com
 ORG			:= Benbentwo
-REPO        := go-bin-generic
-BINARY 		:= bb
+REPO        := ui-survey
+BINARY 		:= ui
 
 # Pretty Constant stuff Below, Configurable above
 
@@ -80,6 +80,9 @@ print-version: ## Print version
 
 build: $(GO_DEPENDENCIES) ## Build binary for current OS
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o build/$(BINARY) $(MAIN_SRC_FILE)
+
+buildqt:
+	qtdeploy -debug build desktop
 
 tidy-deps: ## Cleans up dependencies
 	$(GO) mod tidy

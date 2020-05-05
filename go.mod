@@ -1,4 +1,4 @@
-module github.com/Benbentwo/go-bin-generic
+module github.com/Benbentwo/ui-survey
 
 go 1.12
 
@@ -15,6 +15,7 @@ require (
 	github.com/rickar/props v0.0.0-20170718221555-0b06aeb2f037 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
+	github.com/therecipe/qt v0.0.0-20200126204426-5074eb6d8c41 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/AlecAivazis/survey.v1 v1.8.8
 )
