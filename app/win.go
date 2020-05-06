@@ -10,7 +10,7 @@ import (
 )
 
 // Run runs the command, if args are not nil they will be set on the command
-func Run(args []string) *cobra.Command {
+func Get(args []string) *cobra.Command {
 	configureTerminalForAnsiEscapes()
 	cmd := cmd.NewMainCmd(os.Stdin, os.Stdout, os.Stderr, nil)
 	if len(args) > 0 {

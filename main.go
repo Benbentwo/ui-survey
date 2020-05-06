@@ -1,22 +1,14 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/Benbentwo/ui-survey/app"
-	"github.com/Benbentwo/utils/util"
-	"io/ioutil"
-	"math/rand"
-	"net/http"
-	"os"
-	"reflect"
-	"strconv"
-	"time"
+	"fyne.io/fyne/layout"
 
-	"github.com/spf13/cobra"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/widgets"
+	binary "github.com/Benbentwo/ui-survey/app"
+	cobraUi "github.com/Benbentwo/ui-survey/cobra-ui"
+
+	"fyne.io/fyne"
+	"fyne.io/fyne/app"
+	"fyne.io/fyne/widget"
 )
 
 var data_struct struct {
@@ -33,107 +25,30 @@ var data_struct struct {
 	Day        string `json:"day"`
 }
 
+const preferenceCurrentTab = "currentTab"
+
 func main() {
-	cmd := app.Get(nil)
-	win, widg := createWidget()
-	err := RunCobraUi(cmd, win, widg)
-	if err != nil {
-		util.Logger().Fatalf("on Run Cobra UI: %s", err)
+	ex := app.New()
+	Show(ex)
+	ex.Run()
+}
+
+func Show(app fyne.App) {
+	cmd := binary.Get(nil)
+	window := app.NewWindow("Command Runner")
+	cui := cobraUi.CobraUi{
+		Command: cmd,
+		// Window: window,
 	}
+	form := cui.NewForm()
+
+	submit := cui.CreateRunCommandButton(false)
+	buttons := widget.NewHBox(
+		widget.NewButton("Cancel", func() {
+			window.Close()
+		}),
+		layout.NewSpacer(),
+		submit)
+	window.SetContent(fyne.NewContainerWithLayout(
+		nil, form, buttons, nil))
 }
-
-func RunCobraUi(cmd *cobra.Command, window *widgets.QMainWindow, widgt *widgets.QWidget) error {
-
-	return nil
-}
-
-func createWidget() (*widgets.QMainWindow, *widgets.QWidget) {
-	widgets.NewQApplication(len(os.Args), os.Args)
-
-	window := widgets.NewQMainWindow(nil, 0)
-	widget := widgets.NewQWidget(nil, 0)
-	window.SetCentralWidget(widget)
-
-	layout := widgets.NewQFormLayout(widget)
-	layout.SetFieldGrowthPolicy(widgets.QFormLayout__AllNonFixedFieldsGrow)
-
-	widgetmap := make(map[string]*widgets.QWidget)
-	for i := 0; i < reflect.TypeOf(data_struct).NumField(); i++ {
-		name := reflect.TypeOf(data_struct).Field(i).Tag.Get("json")
-
-		if name != "img" {
-			widgetmap[name] = widgets.NewQLineEdit(nil).QWidget_PTR()
-
-			layout.AddRow3(name, widgetmap[name])
-		} else {
-			widgetmap[name] = widgets.NewQLineEdit(nil).QWidget_PTR()
-			widgetmap[name+"_label"] = widgets.NewQLabel(nil, 0).QWidget_PTR()
-
-			layout.AddRow3(name, widgetmap[name])
-			layout.AddRow3(name+"_label", widgetmap[name+"_label"])
-		}
-	}
-
-	button := widgets.NewQPushButton2("random xkcd", nil)
-	layout.AddWidget(button)
-	button.ConnectClicked(func(bool) {
-		rand.Seed(time.Now().UnixNano())
-
-		resp, err := http.Get(fmt.Sprintf("https://xkcd.com/%v/info.0.json", rand.Intn(614)))
-		if err != nil {
-			return
-		}
-		defer resp.Body.Close()
-		data, _ := ioutil.ReadAll(resp.Body)
-
-		json.Unmarshal(data, &data_struct)
-
-		for i := 0; i < reflect.TypeOf(data_struct).NumField(); i++ {
-			name := reflect.TypeOf(data_struct).Field(i).Tag.Get("json")
-
-			if name != "img" {
-				switch reflect.ValueOf(data_struct).Field(i).Kind() {
-				case reflect.String:
-					widgets.NewQLineEditFromPointer(widgetmap[name].Pointer()).SetText(reflect.ValueOf(data_struct).Field(i).String())
-				case reflect.Int:
-					widgets.NewQLineEditFromPointer(widgetmap[name].Pointer()).SetText(strconv.Itoa(int(reflect.ValueOf(data_struct).Field(i).Int())))
-				}
-			} else {
-				url := reflect.ValueOf(data_struct).Field(i).String()
-
-				widgets.NewQLineEditFromPointer(widgetmap[name].Pointer()).SetText(url)
-
-				resp, err := http.Get(url)
-				if err != nil {
-					return
-				}
-				defer resp.Body.Close()
-				data, _ := ioutil.ReadAll(resp.Body)
-
-				pix := gui.NewQPixmap()
-				pix.LoadFromData(data, uint(len(data)), "", 0)
-				widgets.NewQLabelFromPointer(widgetmap[name+"_label"].Pointer()).SetPixmap(pix.Scaled2(400, 400, core.Qt__KeepAspectRatio, core.Qt__SmoothTransformation))
-			}
-		}
-	})
-
-	// window.Show()
-	// widgets.QApplication_Exec()
-	return window, widget
-}
-
-// package main
-//
-// import (
-// 	"github.com/Benbentwo/ui-survey/app"
-// 	"github.com/therecipe/qt/widgets"
-//
-// 	"os"
-// )
-//
-// func main() {
-// 	if err := app.Run(nil); err != nil {
-// 		os.Exit(1)
-// 	}
-// 	os.Exit(0)
-// }
